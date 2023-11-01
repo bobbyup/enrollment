@@ -32,7 +32,6 @@ function expand_stu_pref(stu_types::Matrix{Int}, student_share::Vector{Float64},
 end
 
 function expand_priority(school_types::Matrix, students::Matrix{Int64}, capacity_share::Vector{Float64})
-    display(school_types)
     if school_types[1] =="U-SD"
         return uniform_priority(students, capacity_share)
     end

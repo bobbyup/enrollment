@@ -6,9 +6,6 @@ function gen_sch_stats(matches, capacity, school_priority, students)
     df = DataFrame(Int64(k) => v for (k, v) in pairs(match_map))
     rename!(df,[:school,:num_match])
 
-    # Create capacity column
-    display(df)
-
     capacity_vec = zeros(Int64, nrow(df))
     i = 1
     not_matched =size(capacity,1)  + 1

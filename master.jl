@@ -1,10 +1,16 @@
 
+using Plots
 using CSV, Tables
 include("loader.jl")
 include("big_da.jl")
 include("analysis.jl")
+include("limit_economy.jl")
 
 stu_types, μ_i, sch_types, μ_s = load_files("3sch_sd_exp")
+
+grid_copies = [10*i for i in 10:1000]
+limit_economy(stu_types, μ_i, sch_types, μ_s, grid_copies)
+stopher
 num_copies = 10000
 
 # Expand student preferences

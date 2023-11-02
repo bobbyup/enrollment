@@ -1,5 +1,5 @@
 using StatsBase
-function gen_sch_stats(matches, capacity, school_priority, students)
+function gen_sch_stats(matches, capacity, school_priority, students, tie_breaker)
     match_map = countmap(matches)
     num_stu = size(students,2)
     # Get num match per school
@@ -26,20 +26,21 @@ function gen_sch_stats(matches, capacity, school_priority, students)
     df.share_stu = df.num_match ./ total_seats
 
     # Generate the cutoffs
-    cutoffs =zeros(Int64, nrow(df))
+    cutoffs =zeros(Float64, nrow(df))
     cutoff_perc = zeros(Float64, nrow(df))
     i = 1
     for school in Set(df.school)
         if school != not_matched
             stu_matched = findall(x -> x == school, matches)
-            cutoff = maximum(school_priority[stu_matched,school])
+            display(stu_matched)
+            display(tie_breaker)
+            display(tie_breaker[stu_matched] )
+            cutoff = maximum(tie_breaker[stu_matched] )
             cutoffs[i] = cutoff
-            cutoff_perc[i] = cutoff/num_stu
         end
         i = i + 1
     end
     df.cutoffs = cutoffs
-    df.cutoff_perc = cutoff_perc 
 
     sort!(df, [:school])
 

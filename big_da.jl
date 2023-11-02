@@ -41,11 +41,15 @@ function uniform_priority(students::Matrix{Int64}, capacity_share::Vector{Float6
 
     # Get the set of students and generate a random ordering for them
     stu_ids = 1:size(students,2)
-    stu_ids = shuffle(stu_ids)
+    stu_tie_breaker = rand(length(stu_ids))
+    stu_ids = [stu_ids stu_tie_breaker]
+    stu_ids = stu_ids[sortperm(stu_ids[:, 2]), :]
+    stu_ids = [stu_ids 1:size(students,2)]
+    stu_ids = stu_ids[sortperm(stu_ids[:, 1]), :] 
 
     # Get number of school, n_sch, then create a matrix with n_sch columns filled in with stu_ids
     n_sch = size(capacity_share,1)
-    return repeat(stu_ids,1,n_sch)
+    return Int.(repeat(stu_ids[:,3],1,n_sch)),stu_ids[:,2] 
 end
 
 function expand_capacity(capacity_share::Vector{Float64}, num_copies::Int64)

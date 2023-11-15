@@ -32,9 +32,6 @@ function gen_sch_stats(matches, capacity, school_priority, students, tie_breaker
     for school in Set(df.school)
         if school != not_matched
             stu_matched = findall(x -> x == school, matches)
-            display(stu_matched)
-            display(tie_breaker)
-            display(tie_breaker[stu_matched] )
             cutoff = maximum(tie_breaker[stu_matched] )
             cutoffs[i] = cutoff
         end

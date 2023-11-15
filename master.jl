@@ -8,12 +8,12 @@ include("limit_economy.jl")
 
 stu_types, μ_i, sch_types, μ_s = load_files("3sch_sd_exp")
 
-#grid_copies = [100*i for i in 1:100]
-#limit_economy(stu_types, μ_i, sch_types, μ_s, grid_copies)
-#stopher
-num_copies = 100000
+grid_copies = [100*i for i in 1:25]
+limit_economy(stu_types, μ_i, sch_types, μ_s, grid_copies, 10)
+stophere
 
 # Expand student preferences
+num_copies = 1000000
 students = expand_stu_pref(stu_types, μ_i, num_copies)
 display(students)
 CSV.write("test_stu.csv",  Tables.table(students), writeheader=false)

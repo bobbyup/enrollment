@@ -12,6 +12,7 @@ function expand_stu_pref(stu_types::Matrix{Int}, student_share::Vector{Float64},
 
     # Inititalize the matrix of student preferences to fill in in the future loop
     students = zeros(Int64, length(stu_types[:,1]), num_students)
+    type_map = Dict()
 
     # Generate the correct number of copies of each student.
     counter_start = 1
@@ -24,11 +25,12 @@ function expand_stu_pref(stu_types::Matrix{Int}, student_share::Vector{Float64},
 
         counter_stop =counter_start +num_type[i]-1
         students[:,counter_start:counter_stop] = new_stu
+        type_map[i] = counter_start:counter_stop
 
         counter_start = counter_start + num_type[i]
     end
 
-    return students
+    return students, type_map
 end
 
 function expand_priority(school_types::Matrix, students::Matrix{Int64}, capacity_share::Vector{Float64})

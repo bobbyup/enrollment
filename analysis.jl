@@ -1,4 +1,11 @@
 using StatsBase
+
+function gen_p_asgn(asgn_vec, num_school)
+    return counts(asgn_vec, num_school+1)./size(asgn_vec,1)
+    
+end
+
+
 function gen_sch_stats(matches, capacity, school_priority, students, tie_breaker)
     match_map = countmap(matches)
     num_stu = size(students,2)

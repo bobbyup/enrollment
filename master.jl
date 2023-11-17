@@ -7,11 +7,11 @@ include("big_da.jl")
 include("analysis.jl")
 include("limit_economy.jl")
 
-stu_types, μ_i, sch_types, μ_s = load_files("3sch_sd_exp")
+stu_types, μ_i, sch_types, μ_s = load_files("rdmd")
+stu_types = singletiebreaking(stu_types)
+grid_copies = [4*i for i in 1:25]
 
-grid_copies = [20*i for i in 1:10]
-
-type_of_interest = 1 
+type_of_interest = 4 
 limit_economy(stu_types, μ_i, sch_types, μ_s, grid_copies,
                 type_of_interest, 1, 1e6)
 

@@ -7,6 +7,7 @@ function load_files(exper_name::String)
 
     # Broadcast the funciton to load each type of file
     stu_types, μ_i, sch_types, μ_s = make_matrix.(files)
+    stu_types = coalesce.(stu_types, findmax(coalesce.(stu_types, 0))[1] + 1)
 
     # Convert the 1-D Matrix to an array
     μ_i = vec(μ_i)

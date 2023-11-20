@@ -1,27 +1,35 @@
-function limit_economy(stu_types, μ_i, sch_types, μ_s, grid_copies, type_of_interest, deriv_index, num_sim)
+function limit_economy(stu_types, μ_i, sch_types, μ_s, grid, type_of_interest, deriv_index, num_sim)
 
     # Initialize the set of cutoff values
     cutoff_vals = zeros(Float64,length(μ_s)+1, length(grid_copies))
-    p_vec = zeros(Float64,length(μ_s)+1, length(grid_copies))
-    ∇p_mat= zeros(Float64,length(μ_s)+1, length(grid_copies))
-    new_stat = zeros(Float64,length(μ_s)+1)
-    p_asgn = zeros(Float64, length(μ_s) + 1)
-    ∇p_asgn = zeros(Float64, length(μ_s) + 1)
+
+    #Intialize market size variables
+    num_stu     = length(μ_i)
+    num_sch     = length(μ_s)
+    num_iters   = length(grid)
+
+    #Set up matrices to be num_student matrices, with each one being the large market outcome over draws
+    p_mat       = zeros(Float64, num_stu, num_sch + 1, num_iters)
+    ∂p_mat      = zeros(Float64, num_stu, num_sch + 1, num_iters)
+    
+    # Set up temporary matrices to be filled in down the line
+    temp_p_asgn      = zeros(Float64, num_stu, num_sch + 1)
+    temp_∂p_asgn     = zeros(Float64, num_stu, num_sch + 1)
 
     # For each of the grid values we want to calculate
     i = 1
-    for num_copies in grid_copies
-        new_stat .= zeros(Float64,length(μ_s)+1)
-        p_asgn .= zeros(Float64, length(μ_s) + 1)
-        ∇p_asgn .= zeros(Float64, length(μ_s) + 1)
+    for market_size in grid_copies
+
+        # Reset values
+        temp_p_asgn     .= zeros(Float64, num_stu, num_sch + 1)
+        temp_∂p_asgn    .= zeros(Float64, num_stu, num_sch + 1)
 
         # If we run multiple simulations for one value, we repeat the economy here
-        students, type_map = expand_stu_pref(stu_types, μ_i, num_copies)
-        #display(students)
-        capacity = expand_capacity(μ_s, num_copies)
-        δ_cap = copy(capacity)
-        δ_cap[deriv_index] = δ_cap[deriv_index] +1
-        ϵ = (sum(δ_cap) - sum(capacity))/num_copies
+        students, type_map = expand_stu_pref(stu_types, μ_i, market_size)
+        capacity = expand_capacity(μ_s, market_size)
+        ∂cap = copy(capacity)
+        ∂cap[deriv_index] = ∂cap[deriv_index] +1
+        ϵ = (sum(∂cap) - sum(capacity))/market_size
 
         #display(capacity)
         for i in 1:num_sim 
@@ -31,39 +39,42 @@ function limit_economy(stu_types, μ_i, sch_types, μ_s, grid_copies, type_of_in
 
             # Run expanded economy
             assn, ranks = deferredacceptance(students, sch_priority, capacity)
-            ∇assn, ranks = deferredacceptance(students, sch_priority, δ_cap)
+            ∂assn, ranks = deferredacceptance(students, sch_priority, ∂cap)
 
             #Analyze statistics
             #assn_stats = gen_sch_stats(assn, capacity, sch_priority, students, tie_breaker)
-            new_p = gen_p_asgn(assn[type_map[type_of_interest]], length(μ_s))
-            ∇_new_p = gen_p_asgn(∇assn[type_map[type_of_interest]], length(μ_s))
-            p_asgn .= p_asgn .+ new_p 
-            ∇p_asgn .= ∇p_asgn .+ (∇_new_p.-new_p)./ϵ
-            #new_stat .= new_stat .+ assn_stats.cutoffs
+            for stu_type in 1:num_stu
+                new_p = gen_p_asgn(assn[type_map[stu_type]], length(μ_s))
+                ∂_new_p = gen_p_asgn(∂assn[type_map[stu_type]], length(μ_s))
+                temp_p_asgn[stu_type,:] .= temp_p_asgn[stu_type,:] .+ new_p 
+                temp_∂p_asgn[stu_type,:] .= temp_∂p_asgn[stu_type,:] .+ (∂_new_p .-new_p)./ϵ
+            end
         end
         #cutoff_vals[:,i] = new_stat ./num_sim 
-        p_vec[:,i] = p_asgn ./ num_sim
-        ∇p_mat[:,i] = ∇p_asgn ./ num_sim
-        display(p_vec)
-        display(∇p_mat)
+        p_mat[:,:,i] .= temp_p_asgn ./ num_sim
+        ∂p_mat[:,:,i] .= temp_∂p_asgn ./ num_sim
+        display(p_mat[:,1,:])
+        display(∂p_mat[:,1,:])
         display(ϵ)
         i = i + 1
     end
     #plot(grid_copies, transpose(cutoff_vals)  )
     #savefig("cutoff_plot.png")
 
-    plot_p = plot(grid_copies, transpose(p_vec)[:,1:3] , 
+    hline([.833,.0833,.0833], label = false, linestyle=:dash , color = :gray )
+    plot!(grid_copies, transpose(p_mat[:,1,:]) , 
         title = "Propensity Score Against Market Size",
         xlabel = "Market Size",
         ylabel = "Propensity Score", 
-        label = ["P1" "P2" "P3"] )
-    hline!(plot_p, [.1,.275,.375], label = false   )
-    savefig(plot_p, "p_plot.png")
+        label = ["Type 1" "Type 2" "Type 3" "Type 4"],  linewidth=2)
+
+    savefig( "p_plot.png")
+    stohper
     plot(grid_copies, transpose(∇p_mat)[:,1:3], 
         title = "Deriv P Against Market Size",
         xlabel = "Market Size",
         ylabel = "Deriv P Score", label = ["D_P1" "D_P2" "D_P3"]  )
-    hline!([2, -1.1667, .1667], label = false)
+    # hline!([2, -1.1667, .1667], label = false)
     savefig("delta_plot.png")
 
 

@@ -11,10 +11,12 @@ function limit_economy(stu_types, μ_i, sch_types, μ_s, grid, type_of_interest,
     #Set up matrices to be num_student matrices, with each one being the large market outcome over draws
     p_mat       = zeros(Float64, num_stu, num_sch + 1, num_iters)
     ∂p_mat      = zeros(Float64, num_stu, num_sch + 1, num_iters)
+    cutoff_vec  = zeros(Float64, num_sch + 1, num_iters)
     
     # Set up temporary matrices to be filled in down the line
-    temp_p_asgn      = zeros(Float64, num_stu, num_sch + 1)
-    temp_∂p_asgn     = zeros(Float64, num_stu, num_sch + 1)
+    temp_p_asgn     = zeros(Float64, num_stu, num_sch + 1)
+    temp_∂p_asgn    = zeros(Float64, num_stu, num_sch + 1)
+    temp_cutoff     = zeros(Float64, num_sch + 1)      
 
     # For each of the grid values we want to calculate
     i = 1
@@ -53,8 +55,8 @@ function limit_economy(stu_types, μ_i, sch_types, μ_s, grid, type_of_interest,
         #cutoff_vals[:,i] = new_stat ./num_sim 
         p_mat[:,:,i] .= temp_p_asgn ./ num_sim
         ∂p_mat[:,:,i] .= temp_∂p_asgn ./ num_sim
-        display(p_mat[:,1,:])
-        display(∂p_mat[:,1,:])
+        display(p_mat[:,3,:])
+        display(∂p_mat[:,3,:])
         display(ϵ)
         i = i + 1
     end
@@ -62,19 +64,20 @@ function limit_economy(stu_types, μ_i, sch_types, μ_s, grid, type_of_interest,
     #savefig("cutoff_plot.png")
 
     hline([.833,.0833,.0833], label = false, linestyle=:dash , color = :gray )
-    plot!(grid_copies, transpose(p_mat[:,1,:]) , 
+    plot!(grid_copies, transpose(p_mat[:,3,:]) , 
         title = "Propensity Score Against Market Size",
         xlabel = "Market Size",
         ylabel = "Propensity Score", 
         label = ["Type 1" "Type 2" "Type 3" "Type 4"],  linewidth=2)
 
     savefig( "p_plot.png")
-    stohper
-    plot(grid_copies, transpose(∇p_mat)[:,1:3], 
+    
+
+    hline([0,-0.3333,.6666], label = false, linestyle=:dash , color = :gray )
+    plot!(grid_copies, transpose(∂p_mat[:,3,:]), 
         title = "Deriv P Against Market Size",
         xlabel = "Market Size",
-        ylabel = "Deriv P Score", label = ["D_P1" "D_P2" "D_P3"]  )
-    # hline!([2, -1.1667, .1667], label = false)
+        ylabel = "Deriv P Score", label = ["Type 1" "Type 2" "Type 3" "Type 4"],  linewidth=2)
     savefig("delta_plot.png")
 
 

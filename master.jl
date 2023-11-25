@@ -11,9 +11,7 @@ stu_types, μ_i, sch_types, μ_s = load_files("rdmd")
 stu_types = singletiebreaking(stu_types)
 grid_copies = [4*i for i in 1:25]
 
-type_of_interest = 4 
-limit_economy(stu_types, μ_i, sch_types, μ_s, grid_copies,
-                type_of_interest, 1, 1e6)
+limit_economy(stu_types, μ_i, sch_types, μ_s, grid_copies, 1, 1e6)
 
 
 

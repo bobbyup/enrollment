@@ -7,11 +7,16 @@ include("big_da.jl")
 include("analysis.jl")
 include("limit_economy.jl")
 
-stu_types, μ_i, sch_types, μ_s = load_files("rdmd")
+stu_types, μ_i, sch_types, μ_s = load_files("not_first")
 stu_types = singletiebreaking(stu_types)
-grid_copies = [4*i for i in 1:25]
+grid_copies = [100*i for i in 1:1]
 
-limit_economy(stu_types, μ_i, sch_types, μ_s, grid_copies, 1, 1e6)
+display(stu_types)
+display(sch_types)
+display(μ_i)
+display(μ_s)
+
+limit_economy(stu_types, μ_i, sch_types, μ_s, grid_copies, 2, 1e1)
 
 
 

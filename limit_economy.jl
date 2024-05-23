@@ -1,4 +1,4 @@
-function limit_economy(stu_types, μ_i, sch_types, μ_s, grid, type_of_interest, deriv_index, num_sim)
+function limit_economy(stu_types, μ_i, sch_types, μ_s, grid, deriv_index, num_sim)
 
     # Initialize the set of cutoff values
     cutoff_vals = zeros(Float64,length(μ_s)+1, length(grid_copies))
@@ -9,22 +9,22 @@ function limit_economy(stu_types, μ_i, sch_types, μ_s, grid, type_of_interest,
     num_iters   = length(grid)
 
     #Set up matrices to be num_student matrices, with each one being the large market outcome over draws
-    p_mat       = zeros(Float64, num_stu, num_sch + 1, num_iters)
-    ∂p_mat      = zeros(Float64, num_stu, num_sch + 1, num_iters)
-    cutoff_vec  = zeros(Float64, num_sch + 1, num_iters)
+    p_mat       = zeros(Float64, num_stu, num_sch, num_iters)
+    ∂p_mat      = zeros(Float64, num_stu, num_sch, num_iters)
+    cutoff_vec  = zeros(Float64, num_sch, num_iters)
     
     # Set up temporary matrices to be filled in down the line
-    temp_p_asgn     = zeros(Float64, num_stu, num_sch + 1)
-    temp_∂p_asgn    = zeros(Float64, num_stu, num_sch + 1)
-    temp_cutoff     = zeros(Float64, num_sch + 1)      
+    temp_p_asgn     = zeros(Float64, num_stu, num_sch)
+    temp_∂p_asgn    = zeros(Float64, num_stu, num_sch)
+    temp_cutoff     = zeros(Float64, num_sch)      
 
     # For each of the grid values we want to calculate
     i = 1
     for market_size in grid_copies
 
         # Reset values
-        temp_p_asgn     .= zeros(Float64, num_stu, num_sch + 1)
-        temp_∂p_asgn    .= zeros(Float64, num_stu, num_sch + 1)
+        temp_p_asgn     .= zeros(Float64, num_stu, num_sch)
+        temp_∂p_asgn    .= zeros(Float64, num_stu, num_sch)
 
         # If we run multiple simulations for one value, we repeat the economy here
         students, type_map = expand_stu_pref(stu_types, μ_i, market_size)
@@ -55,8 +55,8 @@ function limit_economy(stu_types, μ_i, sch_types, μ_s, grid, type_of_interest,
         #cutoff_vals[:,i] = new_stat ./num_sim 
         p_mat[:,:,i] .= temp_p_asgn ./ num_sim
         ∂p_mat[:,:,i] .= temp_∂p_asgn ./ num_sim
-        display(p_mat[:,3,:])
-        display(∂p_mat[:,3,:])
+        display(p_mat[:,:,:])
+        display(∂p_mat[:,:,:])
         display(ϵ)
         i = i + 1
     end

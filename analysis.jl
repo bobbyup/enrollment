@@ -1,7 +1,7 @@
 using StatsBase
 
 function gen_p_asgn(asgn_vec, num_school)
-    return counts(asgn_vec, num_school+1)./size(asgn_vec,1)
+    return counts(asgn_vec, num_school)./size(asgn_vec,1)
     
 end
 

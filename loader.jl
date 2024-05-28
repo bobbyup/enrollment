@@ -3,11 +3,11 @@ using CSV, DataFrames
 function load_files(exper_name::String)
 
     # Create file names
-    files = exper_name * "/" .* ["stu_types", "stu_dist", "sch_types", "sch_dist"] .* ".csv"
+    files = "profiles/" * exper_name * "/" .* ["stu_types", "stu_dist", "sch_types", "sch_dist"] .* ".csv"
 
     # Broadcast the funciton to load each type of file
     stu_types, μ_i, sch_types, μ_s = make_matrix.(files)
-    stu_types = coalesce.(stu_types, findmax(coalesce.(stu_types, 0))[1] + 1)
+    stu_types = coalesce.(stu_types, findmax(coalesce.(stu_types, 0))[1] + 100)
 
     # Convert the 1-D Matrix to an array
     μ_i = vec(μ_i)

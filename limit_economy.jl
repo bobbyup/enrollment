@@ -49,20 +49,19 @@ function limit_economy(stu_types, μ_i, sch_types, μ_s, grid, deriv_index, num_
                 new_p = gen_p_asgn(assn[type_map[stu_type]], length(μ_s))
                 ∂_new_p = gen_p_asgn(∂assn[type_map[stu_type]], length(μ_s))
                 temp_p_asgn[stu_type,:] .= temp_p_asgn[stu_type,:] .+ new_p 
-                temp_∂p_asgn[stu_type,:] .= temp_∂p_asgn[stu_type,:] .+ (∂_new_p .-new_p)./ϵ
+                temp_∂p_asgn[stu_type,:] .= temp_∂p_asgn[stu_type,:] .+ (∂_new_p .-new_p)
             end
         end
         #cutoff_vals[:,i] = new_stat ./num_sim 
         p_mat[:,:,i] .= temp_p_asgn ./ num_sim
         ∂p_mat[:,:,i] .= temp_∂p_asgn ./ num_sim
-        display(p_mat[:,:,:])
-        display(∂p_mat[:,:,:])
-        display(ϵ)
         i = i + 1
     end
+
+    return ∂p_mat
     #plot(grid_copies, transpose(cutoff_vals)  )
     #savefig("cutoff_plot.png")
-
+#= 
     hline([.833,.0833,.0833], label = false, linestyle=:dash , color = :gray )
     plot!(grid_copies, transpose(p_mat[:,3,:]) , 
         title = "Propensity Score Against Market Size",
@@ -81,5 +80,5 @@ function limit_economy(stu_types, μ_i, sch_types, μ_s, grid, deriv_index, num_
     savefig("delta_plot.png")
 
 
-    CSV.write("cutoffs.csv",  Tables.table(cutoff_vals), writeheader=false)
+    CSV.write("cutoffs.csv",  Tables.table(cutoff_vals), writeheader=false) =#
 end
